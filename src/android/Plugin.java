@@ -24,7 +24,7 @@ import com.choosemuse.libmuse.*;
 public class Plugin extends CordovaPlugin {
     public static final String TAG = "MUSE";
 
-    private MuseManager manager;
+    private MuseManagerAndroid manager;
 
     private Muse connectedMuse;
     private List<Muse> pairedMuses;
@@ -68,8 +68,9 @@ public class Plugin extends CordovaPlugin {
     private List<Double> horseshoe;
 
     class Listener extends MuseListener {
+        @Override
         public void museListChanged() {
-
+            Log.i(TAG, "MUSE LIST CHANGED");
         }
     }
 /*
@@ -239,10 +240,7 @@ public class Plugin extends CordovaPlugin {
         // connectionListener = new ConnectionListener();
         // dataListener = new DataListener();
         // listener = new Listener();
-        manager = new MuseManager();
-        manager.setContext();
-        manager.setMuseListener(new Listener());
-        Log.i(TAG, "libmuse version=" + LibMuseVersion.SDK_VERSION);
+        // Log.i(TAG, "libmuse version=" + LibMuseVersion.SDK_VERSION);
     }
 
     /**
@@ -254,8 +252,10 @@ public class Plugin extends CordovaPlugin {
      */
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-
-        getMuseList();
+        manager = MuseManagerAndroid.getInstance();
+        manager.setContext(cordova.getActivity().getApplicationContext());
+        manager.setMuseListener(new Listener());
+        manager.startListening();
     }
 
     /**
@@ -534,10 +534,11 @@ public class Plugin extends CordovaPlugin {
             toastLong(status);
             callbackContext.success(status);
         }
+        */
         else {
             return false;
         }
-        return true;*/
+        return true;
     }
 
     //--------------------------------------------------------------------------
@@ -548,16 +549,13 @@ public class Plugin extends CordovaPlugin {
       */
     private String[] getMuseList() {
         // MuseManager.refreshPairedMuses();
-        System.out.println("Shit coach");
-        Log.i(TAG, "Test");
-        manager.startListening();
+        Log.i(TAG, "Getting list of discovered Muses");
         pairedMuses = manager.getMuses();
         String[] museMacs = new String[pairedMuses.size()];
         for (int i = 0; i < pairedMuses.size(); i++) {
             museMacs[i] = pairedMuses.get(i).getMacAddress();
         }
         Log.i(TAG, "Found " + pairedMuses.size() + " paired muse devices.");
-        manager.stopListening();
         return museMacs;
     }
 
