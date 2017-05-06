@@ -18,7 +18,7 @@
             </feature>
         </config-file>
 
-        <source-file src="src/android/libs/libmuseandroid.jar" target-dir="libs" />
+        <source-file src="src/android/libs/libmuse_android.jar" target-dir="libs" />
         <source-file src="src/android/libs/x86/libmuse_android.so" target-dir="libs/x86/" />
         <source-file src="src/android/libs/armeabi/libmuse_android.so" target-dir="libs/armeabi/" />
 

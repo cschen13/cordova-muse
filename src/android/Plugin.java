@@ -19,16 +19,18 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.interaxon.libmuse.*;
+import com.choosemuse.libmuse.*;
 
 public class Plugin extends CordovaPlugin {
     public static final String TAG = "MUSE";
 
+    private MuseManager manager;
+
     private Muse connectedMuse;
     private List<Muse> pairedMuses;
 
-    private ConnectionListener connectionListener;
-    private DataListener dataListener;
+    // private ConnectionListener connectionListener;
+    // private DataListener dataListener;
     private boolean recordData;
 
     // Data Packets
@@ -65,6 +67,12 @@ public class Plugin extends CordovaPlugin {
 
     private List<Double> horseshoe;
 
+    class Listener extends MuseListener {
+        public void museListChanged() {
+
+        }
+    }
+/*
     class ConnectionListener extends MuseConnectionListener {
 
         CallbackContext callbackContext;
@@ -77,7 +85,7 @@ public class Plugin extends CordovaPlugin {
         }
 
         @Override
-        public void receiveMuseConnectionPacket(MuseConnectionPacket p) {
+        public void receiveMuseConnectionPacket(MuseConnectionPacket p, Muse m) {
             final ConnectionState current = p.getCurrentConnectionState();
             final String status = p.getPreviousConnectionState().toString() +
                          " -> " + current;
@@ -112,7 +120,7 @@ public class Plugin extends CordovaPlugin {
         }
 
         @Override
-        public void receiveMuseDataPacket(MuseDataPacket p) {
+        public void receiveMuseDataPacket(MuseDataPacket p, Muse m) {
             Log.v(TAG, "Received data packet of type " + p.getPacketType() + " recordData set to " + recordData);
             MuseDataPacketType packetType = p.getPacketType();
             if(recordData || packetType == MuseDataPacketType.HORSESHOE) {
@@ -145,7 +153,7 @@ public class Plugin extends CordovaPlugin {
         }
 
         @Override
-        public void receiveMuseArtifactPacket(MuseArtifactPacket p) {
+        public void receiveMuseArtifactPacket(MuseArtifactPacket p, Muse m) {
             if (p.getHeadbandOn() && p.getBlink()) {
                 Log.i(TAG, "blink");
                 Calendar cal = Calendar.getInstance();
@@ -221,14 +229,19 @@ public class Plugin extends CordovaPlugin {
             horseshoe = data;
         }
     }
+    */
 
 
     /**
      * Constructor.
      */
     public Plugin() {
-        connectionListener = new ConnectionListener();
-        dataListener = new DataListener();
+        // connectionListener = new ConnectionListener();
+        // dataListener = new DataListener();
+        // listener = new Listener();
+        manager = new MuseManager();
+        manager.setContext();
+        manager.setMuseListener(new Listener());
         Log.i(TAG, "libmuse version=" + LibMuseVersion.SDK_VERSION);
     }
 
@@ -261,7 +274,7 @@ public class Plugin extends CordovaPlugin {
                 JSONArray jsonMuseList = new JSONArray(Arrays.asList(museList));
                 callbackContext.success(jsonMuseList);
             }
-        } else if (action.equals("connectToMuse")) {
+        }/* else if (action.equals("connectToMuse")) {
             connectToMuse(callbackContext);
         } else if (action.equals("disconnectMuse")) {
             disconnectMuse();
@@ -524,7 +537,7 @@ public class Plugin extends CordovaPlugin {
         else {
             return false;
         }
-        return true;
+        return true;*/
     }
 
     //--------------------------------------------------------------------------
@@ -534,16 +547,21 @@ public class Plugin extends CordovaPlugin {
       * Returns an array of the MAC addresses of all the Muses attached to the device
       */
     private String[] getMuseList() {
-        MuseManager.refreshPairedMuses();
-        pairedMuses = MuseManager.getPairedMuses();
+        // MuseManager.refreshPairedMuses();
+        System.out.println("Shit coach");
+        Log.i(TAG, "Test");
+        manager.startListening();
+        pairedMuses = manager.getMuses();
         String[] museMacs = new String[pairedMuses.size()];
         for (int i = 0; i < pairedMuses.size(); i++) {
             museMacs[i] = pairedMuses.get(i).getMacAddress();
         }
         Log.i(TAG, "Found " + pairedMuses.size() + " paired muse devices.");
+        manager.stopListening();
         return museMacs;
     }
 
+/*
     private String connectToMuse(String macAddress, CallbackContext callbackContext) {
         for (Muse muse : pairedMuses) {
             if (muse.getMacAddress().equals(macAddress)) {
@@ -660,4 +678,5 @@ public class Plugin extends CordovaPlugin {
     private void toastShort(String message) {
         Toast.makeText(cordova.getActivity().getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
+    */
 }
