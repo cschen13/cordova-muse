@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.lang.ref.WeakReference;
 
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
+import android.content.Context;
 
 import com.choosemuse.libmuse.*;
 
@@ -68,9 +70,16 @@ public class Plugin extends CordovaPlugin {
     private List<Double> horseshoe;
 
     class Listener extends MuseListener {
+        final WeakReference<Context> activityRef;
+
+        Listener(final WeakReference<Context> activityRef) {
+            this.activityRef = activityRef;
+        }
+
         @Override
         public void museListChanged() {
             Log.i(TAG, "MUSE LIST CHANGED");
+            //activityRef.get().museListChanged();
         }
     }
 /*
@@ -252,9 +261,14 @@ public class Plugin extends CordovaPlugin {
      */
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+
+        WeakReference<Context> weakActivity =
+                new WeakReference<Context>(cordova.getActivity().getApplicationContext());
+
+
         manager = MuseManagerAndroid.getInstance();
         manager.setContext(cordova.getActivity().getApplicationContext());
-        manager.setMuseListener(new Listener());
+        manager.setMuseListener(new Listener(weakActivity));
         manager.startListening();
     }
 
@@ -270,9 +284,12 @@ public class Plugin extends CordovaPlugin {
         Log.i(TAG, "Action received: " + action);
         if (action.equals("getMuseList")) {
             String[] museList = getMuseList();
-            if (museList != null) {
-                JSONArray jsonMuseList = new JSONArray(Arrays.asList(museList));
-                callbackContext.success(jsonMuseList);
+            if (museList != null && museList.length != 0) {
+                //JSONArray jsonMuseList = new JSONArray(Arrays.asList(museList));
+                //callbackContext.success(jsonMuseList);
+                callbackContext.success("We are here!");
+            } else {
+                callbackContext.success("Nothing found");
             }
         }/* else if (action.equals("connectToMuse")) {
             connectToMuse(callbackContext);
