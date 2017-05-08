@@ -1,26 +1,57 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
 declare var muse;
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [BluetoothSerial]
+  providers: [BluetoothSerial, LocationAccuracy]
 })
 export class HomePage {
 
-  constructor(public navCtrl: NavController, private bluetoothSerial: BluetoothSerial) {
+  constructor(public navCtrl: NavController, private bluetoothSerial: BluetoothSerial, private locationAccuracy: LocationAccuracy) {
 
   }
 
   getDevices() {
-    console.log("Getting devices...");
-    muse.getMuseList(function(success) {
-      console.log("List of connected Muses: " + success);
+    // this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+    //   console.log("here");
+    //   if(canRequest) {
+    //     // the accuracy option will be ignored by iOS
+        this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+          () => {
+            console.log("Getting devices...");
+            muse.getMuseList(function(success) {
+              console.log("List of connected Muses: " + success);
+            }, function(error) {
+              console.log("Error getting list of Muses");
+            });
+          }, error => console.log('Error requesting location permissions', error)
+        );
+      // else console.log("Can't request for some reason ");
+    // });
+
+    /*permissions.checkPermission(permissions.ACCESS_COARSE_LOCATION, function(success) {
+      console.log("Getting devices...");
+      muse.getMuseList(function(success) {
+        console.log("List of connected Muses: " + success);
+      }, function(error) {
+        console.log("Error getting list of Muses");
+      });
     }, function(error) {
-      console.log("Error getting list of Muses");
-    });
+      permissions.requestPermission(permissions.ACCESS_COARSE_LOCATION, function(success) {
+        console.log("Getting devices...");
+        muse.getMuseList(function(success) {
+          console.log("List of connected Muses: " + success);
+        }, function(error) {
+          console.log("Error getting list of Muses");
+        });
+      }, function(error) {
+        console.log('Failed to get coarse location permission');
+      })
+    });*/
   }
 
   readBluetooth() {
