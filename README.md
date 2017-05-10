@@ -1,3 +1,6 @@
+THIS IS AN OLD README FROM THE ORIGINAL REPOSITORY
+https://github.com/mtriff/cordova-muse
+
 # cordova-muse
 
 - Plugin to interface between a Cordova app and Muse device

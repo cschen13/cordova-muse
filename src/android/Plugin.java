@@ -76,13 +76,19 @@ public class Plugin extends CordovaPlugin {
             this.activityRef = activityRef;
         }
 
+        // This callback function SHOULD be called when a new Muse is detected, but it's not at the moment...
         @Override
         public void museListChanged() {
             Log.i(TAG, "MUSE LIST CHANGED");
             //activityRef.get().museListChanged();
         }
     }
-/*
+
+    /*
+    // Commenting these objects out since we don't need them yet
+    // for only the getMuseList function
+    // All of this stuff is from the outdated GitHub fork and will probably need to be rewritten
+    // in some capacity
     class ConnectionListener extends MuseConnectionListener {
 
         CallbackContext callbackContext;
@@ -291,7 +297,10 @@ public class Plugin extends CordovaPlugin {
             } else {
                 callbackContext.success("Nothing found");
             }
-        }/* else if (action.equals("connectToMuse")) {
+        }
+        /* 
+        // Since we're only testing the getMuseList function, the rest of the actions here are unnecessary at the moment
+        else if (action.equals("connectToMuse")) {
             connectToMuse(callbackContext);
         } else if (action.equals("disconnectMuse")) {
             disconnectMuse();
@@ -576,7 +585,9 @@ public class Plugin extends CordovaPlugin {
         return museMacs;
     }
 
-/*
+    /*
+    // We also don't need these functions right now... presumably, after getMuseList() starts working
+    // then we can move onto rewrite these other functions leftover from the GitHub fork
     private String connectToMuse(String macAddress, CallbackContext callbackContext) {
         for (Muse muse : pairedMuses) {
             if (muse.getMacAddress().equals(macAddress)) {

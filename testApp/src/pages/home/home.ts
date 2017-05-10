@@ -16,24 +16,24 @@ export class HomePage {
   }
 
   getDevices() {
-    // this.locationAccuracy.canRequest().then((canRequest: boolean) => {
-    //   console.log("here");
-    //   if(canRequest) {
-    //     // the accuracy option will be ignored by iOS
-        this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
-          () => {
-            console.log("Getting devices...");
-            muse.getMuseList(function(success) {
-              console.log("List of connected Muses: " + success);
-            }, function(error) {
-              console.log("Error getting list of Muses");
-            });
-          }, error => console.log('Error requesting location permissions', error)
-        );
-      // else console.log("Can't request for some reason ");
-    // });
+    // Attempt to use Ionic Native Location Accuracy: http://ionicframework.com/docs/native/location-accuracy/
+    // We use location here because apparently Bluetooth LE requires access to at least coarse location
+    this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then(
+      () => {
+        console.log("Getting devices...");
+        // For some reason, this function always returns an empty list at the moment
+        // First step would be getting this function to work
+        muse.getMuseList(function(success) {
+          console.log("List of connected Muses: " + success);
+        }, function(error) {
+          console.log("Error getting list of Muses");
+        });
+      }, error => console.log('Error requesting location permissions', error)
+    );
 
-    /*permissions.checkPermission(permissions.ACCESS_COARSE_LOCATION, function(success) {
+    /*
+    // Attempt to use cordova-plugin-android-permissions https://github.com/NeoLSN/cordova-plugin-android-permissions
+    permissions.checkPermission(permissions.ACCESS_COARSE_LOCATION, function(success) {
       console.log("Getting devices...");
       muse.getMuseList(function(success) {
         console.log("List of connected Muses: " + success);
@@ -51,7 +51,8 @@ export class HomePage {
       }, function(error) {
         console.log('Failed to get coarse location permission');
       })
-    });*/
+    });
+    */
   }
 
   readBluetooth() {
@@ -61,13 +62,6 @@ export class HomePage {
     }, function(error) {
       console.log("Connection Error: " + error)
     });
-
-    // this.bluetoothSerial.read().then(function(data) {
-      //   	console.log("We made it!");
-      // 	console.log(data);
-      // }, function(error) {
-        // 	console.log('ERROR' + error);
-        // });
   }
 
   checkConnection() {
